@@ -1,0 +1,8 @@
+https://storage.googleapis.com/spcc/simgen_training_set_metadata.csv.gz 17346 6da8c58bfa063731e6d31141c6f88692590b316bd0b8eda53ede41c1c9090f77
+https://storage.googleapis.com/spcc/simgen_training_set.csv.gz 1233732 a2b34e5947b8622b39d0480aed24e4a7411d404b32b1ce874aa68db2fe851ec6
+https://storage.googleapis.com/spcc/simgen_test_set_metadata.csv.gz 245713 f5161f16743e5596a5563c7b4d706d3759279809f6daac478fa751bd84858fbc
+https://storage.googleapis.com/spcc/simgen_test_set.csv.gz 26161474 e91f8551f7b12d03b82457dc03db39ebd802e4e07147ff4247d95b465cdd90a5
+https://storage.googleapis.com/spcc/des_training_set_metadata.csv.gz 19060 8d218724399228f5a648217e1fae740489685a4d0dbe3816ad280d4339823f6d
+https://storage.googleapis.com/spcc/des_training_set.csv.gz 1132791 8eeae66219a498f087b23dcdbe43724ccf83c19b3bee4d93866acb33ea054be1
+https://storage.googleapis.com/spcc/des_test_set_metadata.csv.gz 214035 289038db7950eb7bf8ec93a57efd702d33e95ddade6519a58bc2e90dc95e21d0
+https://storage.googleapis.com/spcc/des_test_set.csv.gz 17628317 8004a1876248ff8aab9cf3f51720f453a06e1b2932df2e96f519e3890a1cd419

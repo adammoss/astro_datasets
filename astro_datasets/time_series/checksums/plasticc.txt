@@ -1,0 +1,4 @@
+https://zenodo.org/record/2539456/files/plasticc_train_metadata.csv.gz 370350 58b008e50426e12aae6a0b9df4d0901bf63e7f9a0da579011988c628a63f23d4
+https://zenodo.org/record/2539456/files/plasticc_train_lightcurves.csv.gz 21553100 1c49a9df7e11a96f774b3d111741ea081321a72a169e311600a7e5ecba0424d3
+https://zenodo.org/record/2539456/files/plasticc_test_metadata.csv.gz 157245185 8048d59cf84ab30fa539ad69aeeebdac6c7347a149b8724e4a32adc9bbf6897e
+https://zenodo.org/record/2539456/files/plasticc_test_lightcurves_01.csv.gz 148537739 388c76d92b3a9572f9beff646ec240e852c4be164c2a63d735247d0b810899f3
