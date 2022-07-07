@@ -1,10 +1,10 @@
+"""Module containing the Mirabest dataset."""
+
 import tensorflow_datasets as tfds
 import os
 import collections
 import pickle
 import numpy as np
-
-# MiraBest data
 
 _MIRABEST_IMAGE_SIZE = 150
 _MIRABEST_IMAGE_SHAPE = (_MIRABEST_IMAGE_SIZE, _MIRABEST_IMAGE_SIZE, 1)
