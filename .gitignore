@@ -131,3 +131,6 @@ dmypy.json
 
 # Mac OS
 .DS_Store
+
+# TFDS download directory
+*tensorflow_datasets*
