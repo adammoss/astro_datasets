@@ -1,9 +1,8 @@
-"""Tensorflow datasets of astronomical time series."""
-import astro_datasets.time_series.checksums
+# Tensorflow datasets of astronomical time series
 import astro_datasets.time_series.spcc
 import astro_datasets.time_series.plasticc
 
-"""Tensorflow datasets of astronomical images."""
+# Tensorflow datasets of astronomical images
 import astro_datasets.images.mirabest
 
 builders = [
@@ -13,4 +12,4 @@ builders = [
     'mirabest_confident',
 ]
 
-__version__ = '0.0.3'
+__version__ = '0.0.6'

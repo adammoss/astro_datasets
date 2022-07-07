@@ -12,7 +12,7 @@ def readfile(filename):
 
 setup(
     name="astro_datasets",
-    version="0.0.3",
+    version="0.0.6",
     description="Astronomy and cosmology tensorflow datasets",
     author="Adam Moss",
     author_email="adam.moss@nottingham.ac.uk",

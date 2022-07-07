@@ -15,7 +15,7 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
 
     VERSION = tfds.core.Version("1.0.0")
     num_classes = 10
-    class_to_label = {
+    class_keys = {
         0: 0,
         1: 1,
         2: 2,
@@ -97,9 +97,9 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
         index = 0  # Using index as key since data is always loaded in same order.
         for path in filepaths:
             for label, np_image in _load_data(path):
-                if label not in self.class_to_label:
+                if label not in self.class_keys:
                     continue
-                record = dict(zip(label_keys, [self.class_to_label[label]]))
+                record = dict(zip(label_keys, [self.class_keys[label]]))
                 # Note: "id" is only provided for the user convenience. To shuffle the
                 # dataset we use `index`, so that the sharding is compatible with
                 # earlier versions.
@@ -142,7 +142,7 @@ def _load_data(path):
 
 class MIRABESTConfident(MIRABEST):
     num_classes = 2
-    class_to_label = {
+    class_keys = {
         0: 0,
         1: 0,
         2: 0,

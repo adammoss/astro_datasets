@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import tensorflow_datasets as tfds
 
-from .util import AstroTsDatasetBuilder, AstroTsDatasetInfo
+from astro_datasets.time_series.util import AstroTsDatasetBuilder, AstroTsDatasetInfo
 
 RESOURCES = os.path.join(
     os.path.dirname(__file__), 'resources', 'plasticc')
@@ -112,7 +112,7 @@ class PlasticcDataReader(Sequence):
         instance = self.metadata.iloc[index]
         static = instance[self.static_features]
         static_errors = instance[self.static_error_features]
-        object_id = instance['object_id']
+        object_id = int(instance['object_id'])
         # Read data
         timeseries = self._read_timeseries(object_id)
         time = timeseries['time']

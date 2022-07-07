@@ -1,5 +1,4 @@
 tensorflow
 tensorflow_datasets
-pickle
 numpy
 pandas
