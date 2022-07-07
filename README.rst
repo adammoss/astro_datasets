@@ -47,3 +47,11 @@ structure:
 - ``targets``: Directory of potential target values, the available endpoints are
   dataset specific.
 - ``metadata``: Directory of metadata on an individual object
+
+
+Credits
+-------
+
+Lauren Gaughan
+Samuel Gibbon
+
