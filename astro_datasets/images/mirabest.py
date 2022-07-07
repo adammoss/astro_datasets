@@ -112,7 +112,7 @@ class MiraBestInfo(
         "test_files",
         "label_files",
         "label_keys",
-    ])):
+        ])):
     """Contains the information necessary to generate a CIFAR dataset.
     Attributes:
       name (str): name of dataset.
