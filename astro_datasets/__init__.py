@@ -9,7 +9,8 @@ import astro_datasets.images.mirabest
 builders = [
     'spcc',
     'plasticc',
-    'mirabest'
+    'mirabest',
+    'mirabest_confident',
 ]
 
 __version__ = '0.1.0'
