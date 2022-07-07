@@ -131,3 +131,5 @@ dmypy.json
 
 # Mac OS
 .DS_Store
+
+*tensorflow_datasets*
