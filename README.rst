@@ -12,7 +12,7 @@ Currently implemented time series datasets are:
 
 Currently implemented image datasets are:
 
-- ``mirabest``
+- ``mirabest``, ``mirabest_confident``
 
 This is based on the medical datasets repository https://github.com/ExpectationMax/medical_ts_datasets
 
