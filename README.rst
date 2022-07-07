@@ -52,6 +52,6 @@ structure:
 Credits
 -------
 
-Lauren Gaughan
+Lauren Gaughan,
 Samuel Gibbon
 
