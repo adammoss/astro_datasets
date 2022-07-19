@@ -4,6 +4,8 @@ import collections
 import numpy as np
 import pickle
 import csv
+import matplotlib.pyplot as plt
+import tensorflow as tf
 
 # CMD constants
 _CMD_URL = "https://users.flatironinstitute.org/~fvillaescusa/priv/DEPnzxoWlaTQ6CjrXqsm0vYi8L7Jy/CMD/2D_maps/data/"
@@ -85,8 +87,6 @@ _CMD_SIMBA_LH_Z_DATA_FILENAME = "Maps_Z_SIMBA_LH_z=0.00.npy"
 _CMD_IMAGE_SIZE = 256
 _CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
-params = ''
-data = ''
 
 class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
@@ -163,252 +163,12 @@ class CMD(tfds.core.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
+        #os.remove()
+        cmd_label_path = dl_manager.download(_CMD_URL+'params_'+self.simulation+'.txt')
+        cmd_data_path = dl_manager.download(_CMD_URL+'Maps_'+self.field+'_'+self.simulation+'_'+self.sim_set+'_z=0.00.npy')
+        #print(cmd_label_path)
+        #print(cmd_data_path)
 
-
-        # mirabest_path = os.path.join(mirabest_path, mirabest_info.prefix)
-
-        global params
-        global data
-
-        #simulation = self.simulation
-        #sim_set = self.sim_set
-        #field = self.field
-
-        if self.field == 'B' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_B_DATA_FILENAME
-
-            #params = label_files[1]
-            #data = train_files[5]
-            #label_files = params
-            #train_files = data
-
-            print('Magnetic field is IllustrisTNG simulation data only')
-
-        elif self.field == 'B' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_B_DATA_FILENAME
-            print('Magnetic field is IllustrisTNG simulation data only')
-
-        elif self.simulation == 'Nbody_IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_N_ILLUS_PARAMS_FILENAME
-            data = _CMD_N_ILLUS_CV_MTOT_DATA_FILENAME
-            print('N-body field data is only MTOT')
-
-        elif self.simulation == 'Nbody_IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_N_ILLUS_PARAMS_FILENAME
-            data = _CMD_N_ILLUS_LH_MTOT_DATA_FILENAME
-            print('N-body field data is only MTOT')
-
-        elif self.simulation == 'Nbody_SIMBA' and self.sim_set == 'CV':
-            params = _CMD_N_SIMBA_PARAMS_FILENAME
-            data = _CMD_N_SIMBA_CV_MTOT_DATA_FILENAME
-            print('N-body field data is only MTOT')
-
-        elif self.simulation == 'Nbody_SIMBA' and self.sim_set == 'LH':
-            params = _CMD_N_SIMBA_PARAMS_FILENAME
-            data = _CMD_N_SIMBA_LH_MTOT_DATA_FILENAME
-            print('N-body field data is only MTOT')
-
-        elif self.field == 'HI' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_HI_DATA_FILENAME
-
-        elif self.sim_set == 'HI' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_HI_DATA_FILENAME
-
-        elif self.sim_set == 'HI' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_HI_DATA_FILENAME
-
-        elif self.sim_set == 'HI' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_HI_DATA_FILENAME
-
-        elif self.sim_set == 'MCDM' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_MCDM_DATA_FILENAME
-
-        elif self.sim_set == 'MCDM' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_MCDM_DATA_FILENAME
-
-        elif self.sim_set == 'MCDM' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_MCDM_DATA_FILENAME
-
-        elif self.sim_set == 'MCDM' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_MCDM_DATA_FILENAME
-
-        elif self.sim_set == 'MGAS' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_MGAS_DATA_FILENAME
-
-        elif self.sim_set == 'MGAS' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_MGAS_DATA_FILENAME
-
-        elif self.sim_set == 'MGAS' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_MGAS_DATA_FILENAME
-
-        elif self.sim_set == 'MGAS' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_MGAS_DATA_FILENAME
-
-        elif self.sim_set == 'MGFE' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_MGFE_DATA_FILENAME
-
-        elif self.sim_set == 'MGFE' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_MGFE_DATA_FILENAME
-
-        elif self.sim_set == 'MGFE' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_MGFE_DATA_FILENAME
-
-        elif self.sim_set == 'MGFE' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_MGFE_DATA_FILENAME
-
-        elif self.sim_set == 'MSTAR' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_MSTAR_DATA_FILENAME
-
-        elif self.sim_set == 'MSTAR' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_MSTAR_DATA_FILENAME
-
-        elif self.sim_set == 'MSTAR' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_MSTAR_DATA_FILENAME
-
-        elif self.sim_set == 'MSTAR' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_MSTAR_DATA_FILENAME
-
-        elif self.sim_set == 'MTOT' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_MTOT_DATA_FILENAME
-
-        elif self.sim_set == 'MTOT' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_MTOT_DATA_FILENAME
-
-        elif self.sim_set == 'MTOT' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_MTOT_DATA_FILENAME
-
-        elif self.sim_set == 'MTOT' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_MTOT_DATA_FILENAME
-
-        elif self.sim_set == 'NE' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_NE_DATA_FILENAME
-
-        elif self.sim_set == 'NE' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_NE_DATA_FILENAME
-
-        elif self.sim_set == 'NE' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_NE_DATA_FILENAME
-
-        elif self.sim_set == 'NE' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_NE_DATA_FILENAME
-
-        elif self.sim_set == 'P' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_P_DATA_FILENAME
-
-        elif self.sim_set == 'P' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_P_DATA_FILENAME
-
-        elif self.sim_set == 'P' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_P_DATA_FILENAME
-
-        elif self.sim_set == 'P' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_P_DATA_FILENAME
-
-        elif self.sim_set == 'T' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_T_DATA_FILENAME
-
-        elif self.sim_set == 'T' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_T_DATA_FILENAME
-
-        elif self.sim_set == 'T' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_T_DATA_FILENAME
-
-        elif self.sim_set == 'T' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_T_DATA_FILENAME
-
-        elif self.sim_set == 'VCDM' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_VCDM_DATA_FILENAME
-
-        elif self.sim_set == 'VCDM' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_VCDM_DATA_FILENAME
-
-        elif self.sim_set == 'VCDM' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_VCDM_DATA_FILENAME
-
-        elif self.sim_set == 'VCDM' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_VCDM_DATA_FILENAME
-
-        elif self.sim_set == 'VGAS' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_VGAS_DATA_FILENAME
-
-        elif self.sim_set == 'VGAS' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_VGAS_DATA_FILENAME
-
-        elif self.sim_set == 'VGAS' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_VGAS_DATA_FILENAME
-
-        elif self.sim_set == 'VGAS' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_VGAS_DATA_FILENAME
-
-        elif self.sim_set == 'Z' and self.simulation == 'IllustrisTNG' and self.sim_set == 'CV':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_CV_Z_DATA_FILENAME
-
-        elif self.sim_set == 'Z' and self.simulation == 'IllustrisTNG' and self.sim_set == 'LH':
-            params = _CMD_ILLUS_PARAMS_FILENAME
-            data = _CMD_ILLUS_LH_Z_DATA_FILENAME
-
-        elif self.sim_set == 'Z' and self.simulation == 'SIMBA' and self.sim_set == 'CV':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_CV_Z_DATA_FILENAME
-
-        elif self.sim_set == 'Z' and self.simulation == 'SIMBA' and self.sim_set == 'LH':
-            params = _CMD_SIMBA_PARAMS_FILENAME
-            data = _CMD_SIMBA_LH_Z_DATA_FILENAME
-
-        else:
-            print('Incorrect arguments')
-
-
-
-        cmd_data_path = dl_manager.download(os.path.join(self._cmd_info.url, data))
-        cmd_label_path = dl_manager.download(os.path.join(self._cmd_info.url, params))
         cmd_info = self._cmd_info
 
         return {
@@ -427,36 +187,54 @@ class CMD(tfds.core.GeneratorBasedBuilder):
 
     def _generate_examples(self, images_path, label_path):
 
-        #file = np.loadtxt(label_path)
-        #y = np.ones([15000, 6])
+        file = np.loadtxt(label_path)
+        y = np.ones([15000, 6])
+        for j in range(1000):
+            y[(15 * j):15 * (j + 1) + j, :] = file[j, :]
 
-        #for j in range(1000):
-            #y[(15 * j):15 * (j + 1) + j, :] = file[j, :]
+        #y1 = y[:, 0]#parameter choice = number]
 
-        print(label_path)
+        #minimum = np.array([0.1, 0.6])
+        #maximum = np.array([0.5, 1.0])
 
-        with label_path.open() as f:
-            #file1 = np.open(f)
-            #file2 = np.read(f)
-            #print(file1)
-            #print(file2)
-            #print(f)
-            for row in csv.DictReader(f):
-                print(row)
-                #y = np.ones([15000, 6])
-                #y[0:14, :] = row           FOR ALL 1000 ROWS BUT THE FILE IS NOT THE PARAMETERS ANYMORE
-
-                #for j in range(1000):
-                    #y[(15 * j):15 * (j + 1) + j, :] = f[j, :]
+        #y = (y - minimum[0]) / (maximum[0] - minimum[0])
+        np.savetxt(label_path, y)
 
 
-                image_id = row['image_id'] #NEEDS TO BE ROW NUMBER THERE IS NO IMAGE ID
-                # And yield (key, feature_dict)
-                yield image_id, {
-                    'image_description': row['description'],
-                    'image': images_path / f'{image_id}.jpeg',
-                    'label': row['label'],
-                }
+        #mean, std = np.mean(np.arcsinh(np.load(images_path))), np.std(np.arcsinh(np.load(images_path)))
+        #normalised = (np.arcsinh(np.load(images_path)) - mean) / std
+        #np.save(images_path, normalised)
+        #plt.imshow(np.load(images_path)[0])
+
+        #with label_path.open() as f:
+
+        #parameters = np.loadtxt(label_path)
+        #for count in range(len(parameters)):
+            #image_id = count
+            #a = np.load(images_path)[count]
+            #a = np.uint8(np.load(images_path)[count])
+            #a = a.reshape(256, 256, 1)
+            #plt.imshow(a)
+            #row = parameters[count, :]
+
+
+            # And yield (key, feature_dict)
+            #yield image_id, {
+                #'image_description': row['description'],
+                #'image': a,
+                #'label': row,
+            #}
+
+        with tf.io.gfile.GFile(images_path, "rb") as f:
+            images = np.load(f)
+        with tf.io.gfile.GFile(label_path, "rb") as f:
+            labels = np.loadtxt(f)
+        for i, (image, label) in enumerate(zip(images, labels)):
+            record = {
+                "image": image,
+                "label": label,
+            }
+            yield i, record
 
 
 
