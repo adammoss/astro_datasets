@@ -1,10 +1,7 @@
 import tensorflow_datasets as tfds
-import os
 import collections
 import numpy as np
 import pickle
-import csv
-import matplotlib.pyplot as plt
 import tensorflow as tf
 
 # CMD constants
@@ -85,25 +82,22 @@ _CMD_SIMBA_CV_Z_DATA_FILENAME = "Maps_Z_SIMBA_CV_z=0.00.npy"
 _CMD_SIMBA_LH_Z_DATA_FILENAME = "Maps_Z_SIMBA_LH_z=0.00.npy"
 # CMD image sizes
 _CMD_IMAGE_SIZE = 256
-_CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE)
+_CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
 
 class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
 
     URL = _CMD_URL
-
     VERSION = tfds.core.Version("1.0.0")
 
-    # num_classes =
-
-    def __init__(self, simulation, sim_set, field, *kwargs, **kwds):
+    def __init__(self, simulation, sim_set, field, parameters, *kwargs, **kwds):
         # Allow default target to be changed when loading dataset
         self.simulation = simulation
         self.sim_set = sim_set
         self.field = field
+        self.parameters = parameters
         super().__init__(*kwargs, **kwds)
-
 
     def _info(self):
         return tfds.core.DatasetInfo(
@@ -115,12 +109,10 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                          "There are corresponding N-body simulations for each"
                          "(magneto-)hydrodynamic simulation."),
             features=tfds.features.FeaturesDict({
-                # "id": tfds.features.Text(),
                 "image": tfds.features.Tensor(shape=_CMD_IMAGE_SHAPE, dtype=tf.float32),
-                'label': tfds.features.Tensor(shape=(6,), dtype=tf.float64),
-                #"label": tfds.features.ClassLabel(num_classes=self.num_classes),
+                'label': tfds.features.Tensor(shape=(len(self.parameters),), dtype=tf.float64),
             }),
-            # supervised_keys=("image", "label"),
+            supervised_keys=("image", "label"),
             homepage="https://camels-multifield-dataset.readthedocs.io/en/latest/index.html",
         )
 
@@ -155,8 +147,6 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                          _CMD_SIMBA_CV_VGAS_DATA_FILENAME, _CMD_SIMBA_LH_VGAS_DATA_FILENAME,
                          _CMD_ILLUS_CV_Z_DATA_FILENAME, _CMD_ILLUS_LH_Z_DATA_FILENAME, _CMD_SIMBA_CV_Z_DATA_FILENAME,
                          _CMD_SIMBA_LH_Z_DATA_FILENAME],
-            # test_files=["test_batch"],
-            # prefix="batches",
             label_files=[_CMD_SIMBA_PARAMS_FILENAME, _CMD_ILLUS_PARAMS_FILENAME,
                          _CMD_N_SIMBA_PARAMS_FILENAME, _CMD_N_ILLUS_PARAMS_FILENAME],
             label_keys=["label"],
@@ -164,12 +154,12 @@ class CMD(tfds.core.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
-        #os.remove()
+
+        assert 'params_'+self.simulation+'.txt' in self._cmd_info.label_files, 'Invalid parameter file'
+        assert 'Maps_'+self.field+'_'+self.simulation+'_'+self.sim_set+'_z=0.00.npy' in self._cmd_info.train_files, 'Invalid data file'
+
         cmd_label_path = dl_manager.download(_CMD_URL+'params_'+self.simulation+'.txt')
         cmd_data_path = dl_manager.download(_CMD_URL+'Maps_'+self.field+'_'+self.simulation+'_'+self.sim_set+'_z=0.00.npy')
-        #print(cmd_label_path)
-        #print(cmd_data_path)
-
         cmd_info = self._cmd_info
 
         return {
@@ -179,57 +169,33 @@ class CMD(tfds.core.GeneratorBasedBuilder):
             ),
         }
 
-
-    # y = np.ones([15000, 6])
-
-    # for j in range(1000):
-        # y[(15 * j):15 * (j + 1) + j, :] = cmd_label_path[j, :]
-
-
     def _generate_examples(self, images_path, label_path):
-
+        # Resize parameters to match the array size of images
         file = np.loadtxt(label_path)
-        y = np.ones([15000, 6])
-        for j in range(1000):
-            y[(15 * j):15 * (j + 1) + j, :] = file[j, :]
+        file = np.repeat(file, 15, axis=0)
 
-        #y1 = y[:, 0]#parameter choice = number]
+        parameters = ['omega_m', 'sigma_8', 'a_sn1', 'a_agn1', 'a_asn2', 'a_agn2']
+        choice = self.parameters
+        final = np.zeros(len(parameters), dtype=bool)
+        for y in range(len(choice)):
+            for x in range(len(parameters)):
+                if final[x] == False:
+                    final[x] = choice[y] in parameters[x]
+                elif final[x] == True:
+                    final[x] == True
 
-        #minimum = np.array([0.1, 0.6])
-        #maximum = np.array([0.5, 1.0])
+        a = [i for i, x in enumerate(final) if x]
 
-        #y = (y - minimum[0]) / (maximum[0] - minimum[0])
-        np.savetxt(label_path, y)
+        assert len(a) != 0, 'Invalid parameters' #not sure why this is != when it should be ==?
+                                                # Also this doesn't ensure the user can't enter an incorrect value
 
-
-        #mean, std = np.mean(np.arcsinh(np.load(images_path))), np.std(np.arcsinh(np.load(images_path)))
-        #normalised = (np.arcsinh(np.load(images_path)) - mean) / std
-        #np.save(images_path, normalised)
-        #plt.imshow(np.load(images_path)[0])
-
-        #with label_path.open() as f:
-
-        #parameters = np.loadtxt(label_path)
-        #for count in range(len(parameters)):
-            #image_id = count
-            #a = np.load(images_path)[count]
-            #a = np.uint8(np.load(images_path)[count])
-            #a = a.reshape(256, 256, 1)
-            #plt.imshow(a)
-            #row = parameters[count, :]
-
-
-            # And yield (key, feature_dict)
-            #yield image_id, {
-                #'image_description': row['description'],
-                #'image': a,
-                #'label': row,
-            #}
+        file = file[:, a]
+        np.savetxt(label_path, file)
 
         with tf.io.gfile.GFile(images_path, "rb") as f:
             images = np.load(f)
+            images = np.expand_dims(images, -1)
         with tf.io.gfile.GFile(label_path, "rb") as f:
-            #labels = np.load(f, allow_pickle=True)
             labels = np.loadtxt(f)
         for i, (image, label) in enumerate(zip(images, labels)):
             record = {
@@ -237,7 +203,6 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                 "label": label,
             }
             yield i, record
-
 
 
 class CMDInfo(
@@ -253,9 +218,8 @@ class CMDInfo(
       name (str): name of dataset.
       url (str): data URL.
       prefix (str): path prefix within the downloaded and extracted file to look
-        for `train_files` and `test_files`.
+        for `train_files`.
       train_files (list<str>): name of training files within `prefix`.
-
       label_files (list<str>): names of the label files in the data.
       label_keys (list<str>): names of the label keys in the data.
     """
