@@ -85,7 +85,7 @@ _CMD_SIMBA_CV_Z_DATA_FILENAME = "Maps_Z_SIMBA_CV_z=0.00.npy"
 _CMD_SIMBA_LH_Z_DATA_FILENAME = "Maps_Z_SIMBA_LH_z=0.00.npy"
 # CMD image sizes
 _CMD_IMAGE_SIZE = 256
-_CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
+_CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE)
 
 
 class CMD(tfds.core.GeneratorBasedBuilder):
@@ -116,8 +116,9 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                          "(magneto-)hydrodynamic simulation."),
             features=tfds.features.FeaturesDict({
                 # "id": tfds.features.Text(),
-                "image": tfds.features.Image(shape=_CMD_IMAGE_SHAPE),
-                # "label": tfds.features.ClassLabel(num_classes=self.num_classes),
+                "image": tfds.features.Tensor(shape=_CMD_IMAGE_SHAPE, dtype=tf.float32),
+                'label': tfds.features.Tensor(shape=(6,), dtype=tf.float64),
+                #"label": tfds.features.ClassLabel(num_classes=self.num_classes),
             }),
             # supervised_keys=("image", "label"),
             homepage="https://camels-multifield-dataset.readthedocs.io/en/latest/index.html",
@@ -228,6 +229,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         with tf.io.gfile.GFile(images_path, "rb") as f:
             images = np.load(f)
         with tf.io.gfile.GFile(label_path, "rb") as f:
+            #labels = np.load(f, allow_pickle=True)
             labels = np.loadtxt(f)
         for i, (image, label) in enumerate(zip(images, labels)):
             record = {
