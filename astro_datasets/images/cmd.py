@@ -86,8 +86,9 @@ _CMD_IMAGE_SIZE = 256
 _CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
 _CMD_PARAMETERS = ['omegam', 'sigma8', 'asn1', 'aagn1', 'asn2', 'aagn2']
-_CMD_FIELDS = ['Mtot', 'B', 'HI', 'Mcdm', 'Mgas', 'MgFe', 'Mstar', 'Mtot', 'ne', 'P', 'T', 'Vcdm', 'Vgas', 'Z']
-_CMD_SIMULATIONS = ['IllustrisTNG', 'SIMBA']
+_CMD_FIELDS = ['Mtot', 'B', 'HI', 'Mcdm', 'Mgas', 'MgFe', 'Mstar', 'Mtot', 'ne', 'P', 'T', 'Vcdm',
+               'Vgas', 'Z']
+_CMD_SIMULATIONS = ['IllustrisTNG', 'SIMBA', 'Nbody_IllustrisTNG', 'Nbody_SIMBA']
 _CMD_SIM_SET = ['CV', 'LH']
 
 
@@ -95,14 +96,12 @@ class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
 
     URL = _CMD_URL
-    VERSION = tfds.core.Version("1.0.0")
+    VERSION = tfds.core.Version("1.0.2")
 
-    def __init__(self, simulation, sim_set, field, parameters=None, *kwargs, **kwds):
+    def __init__(self, simulation, field, parameters=None, *kwargs, **kwds):
         assert simulation in _CMD_SIMULATIONS, 'Not a valid simulation'
-        assert sim_set in _CMD_SIM_SET, 'Not a valid sim set'
         assert field in _CMD_FIELDS, 'Not a valid field'
         self.simulation = simulation
-        self.sim_set = sim_set
         self.field = field
         if parameters is not None:
             assert len(parameters) > 0, 'No parameters given'
@@ -112,7 +111,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         else:
             self.parameters = _CMD_PARAMETERS
         self.parameter_indices = [_CMD_PARAMETERS.index(p) for p in self.parameters]
-        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], sim_set, field] + self.parameters))
+        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], field] + self.parameters))
         super().__init__(*kwargs, **kwds)
 
     def _info(self):
@@ -173,7 +172,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         params_file = 'params_' + self.simulation + '.txt'
         assert params_file in self._cmd_info.label_files, 'Invalid parameter file'
         cmd_label_path = dl_manager.download(os.path.join(_CMD_URL, params_file))
-        data_file = 'Maps_' + self.field + '_' + self.simulation + '_' + self.sim_set + '_z=0.00.npy'
+        data_file = 'Maps_' + self.field + '_' + self.simulation + '_LH_z=0.00.npy'
         assert data_file in self._cmd_info.train_files, 'Invalid data file'
         cmd_data_path = dl_manager.download(os.path.join(_CMD_URL, data_file))
         return {
