@@ -1,7 +1,6 @@
 import tensorflow_datasets as tfds
 import collections
 import numpy as np
-import pickle
 import tensorflow as tf
 
 # CMD constants
@@ -17,7 +16,7 @@ _CMD_N_ILLUS_CV_MTOT_DATA_FILENAME = "Maps_Mtot_Nbody_IllustrisTNG_CV_z=0.00.npy
 _CMD_N_ILLUS_LH_MTOT_DATA_FILENAME = "Maps_Mtot_Nbody_IllustrisTNG_LH_z=0.00.npy"
 _CMD_N_SIMBA_CV_MTOT_DATA_FILENAME = "Maps_Mtot_Nbody_SIMBA_CV_z=0.00.npy"
 _CMD_N_SIMBA_LH_MTOT_DATA_FILENAME = "Maps_Mtot_Nbody_SIMBA_LH_z=0.00.npy"
-# IllustrisTNG magenetic field data
+# IllustrisTNG magnetic field data
 _CMD_ILLUS_CV_B_DATA_FILENAME = "Maps_B_IllustrisTNG_CV_z=0.00.npy"
 _CMD_ILLUS_LH_B_DATA_FILENAME = "Maps_B_IllustrisTNG_LH_z=0.00.npy"
 # Neutral hydrogen density field data
@@ -97,6 +96,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         self.sim_set = sim_set
         self.field = field
         self.parameters = parameters
+        kwds['data_dir'] = ''.join([simulation[:1], sim_set, field] + parameters)
         super().__init__(*kwargs, **kwds)
 
     def _info(self):
@@ -106,8 +106,15 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                          "indicating the type of simulation used to create the data."
                          "IllustrisTNG are magneto-hydrodynamic simulations."
                          "SIMBA are hydrodynamic simulations."
-                         "There are corresponding N-body simulations for each"
-                         "(magneto-)hydrodynamic simulation."),
+                         "There are corresponding N-body simulations for  (magneto-)hydrodynamic simulation."
+                         "There are 15000 256x256 greyscale images, covering a periodic area of (25 h^-1 Mpc)^2, "
+                         "each with 6 corresponding parameters:"
+                         "'omega_m', sigma_8', 'a_sn1', 'a_agn1', 'a_sn2', 'a_agn2'."
+                         "The data consists of 12 different fields and a magnetic field file for IllustrisTNG only:"
+                         "gas density 'Mgas', gas velocity 'Vgas', gas temperature 'T', gas pressure 'P',"
+                         "gas metallicity 'Z', neutral hydrogen density 'HI', electron number density 'ne',"
+                         "magnetic fields 'B', magnesium over iron 'MgFe', dark matter density 'Mcdm',"
+                         "dark matter velocity 'Vcdm', stellar mass density 'Mstar', total matter density 'Mtot'."),
             features=tfds.features.FeaturesDict({
                 "image": tfds.features.Tensor(shape=_CMD_IMAGE_SHAPE, dtype=tf.float32),
                 'label': tfds.features.Tensor(shape=(len(self.parameters),), dtype=tf.float64),
@@ -182,22 +189,18 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                 if final[x] == False:
                     final[x] = choice[y] in parameters[x]
                 elif final[x] == True:
-                    final[x] == True
+                    final[x] = True
 
         a = [i for i, x in enumerate(final) if x]
 
         assert len(a) != 0, 'Invalid parameters' #not sure why this is != when it should be ==?
                                                 # Also this doesn't ensure the user can't enter an incorrect value
-
         file = file[:, a]
-        np.savetxt(label_path, file)
 
         with tf.io.gfile.GFile(images_path, "rb") as f:
             images = np.load(f)
             images = np.expand_dims(images, -1)
-        with tf.io.gfile.GFile(label_path, "rb") as f:
-            labels = np.loadtxt(f)
-        for i, (image, label) in enumerate(zip(images, labels)):
+        for i, (image, label) in enumerate(zip(images, file)):
             record = {
                 "image": image,
                 "label": label,
@@ -225,9 +228,3 @@ class CMDInfo(
     """
 
 
-def _load_data(path):
-    """Yields (label, np_image) tuples."""
-    with open(path, 'rb') as f:
-        data_store = pickle.load(f)
-    for i in range(len(data_store['labels'])):
-        yield data_store['labels'][i], np.expand_dims(data_store['data'][i], -1)
