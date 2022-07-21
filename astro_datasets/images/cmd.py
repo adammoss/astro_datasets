@@ -1,4 +1,6 @@
 import tensorflow_datasets as tfds
+from tensorflow_datasets.core.constants import DATA_DIR
+import os
 import collections
 import numpy as np
 import tensorflow as tf
@@ -83,6 +85,7 @@ _CMD_SIMBA_LH_Z_DATA_FILENAME = "Maps_Z_SIMBA_LH_z=0.00.npy"
 _CMD_IMAGE_SIZE = 256
 _CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
+_CMD_DEFAULT_PARAMETERS = ['omegam', 'sigma8', 'asn1', 'aagn1', 'aasn2', 'aagn2']
 
 class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
@@ -90,13 +93,19 @@ class CMD(tfds.core.GeneratorBasedBuilder):
     URL = _CMD_URL
     VERSION = tfds.core.Version("1.0.0")
 
-    def __init__(self, simulation, sim_set, field, parameters, *kwargs, **kwds):
-        # Allow default target to be changed when loading dataset
+    def __init__(self, simulation, sim_set, field, parameters=None, *kwargs, **kwds):
         self.simulation = simulation
         self.sim_set = sim_set
         self.field = field
-        self.parameters = parameters
-        kwds['data_dir'] = ''.join([simulation[:1], sim_set, field] + parameters)
+        if parameters is not None:
+            assert len(parameters) > 0, 'No parameters given'
+            for p in parameters:
+                assert p in _CMD_DEFAULT_PARAMETERS, 'Not a valid parameter'
+            self.parameters = parameters
+        else:
+            self.parameters = _CMD_DEFAULT_PARAMETERS
+        self.parameter_indices = [_CMD_DEFAULT_PARAMETERS.index(p) for p in self.parameters]
+        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], sim_set, field] + self.parameters))
         super().__init__(*kwargs, **kwds)
 
     def _info(self):
@@ -167,7 +176,6 @@ class CMD(tfds.core.GeneratorBasedBuilder):
 
         cmd_label_path = dl_manager.download(_CMD_URL+'params_'+self.simulation+'.txt')
         cmd_data_path = dl_manager.download(_CMD_URL+'Maps_'+self.field+'_'+self.simulation+'_'+self.sim_set+'_z=0.00.npy')
-        cmd_info = self._cmd_info
 
         return {
             'train': self._generate_examples(
@@ -177,30 +185,14 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         }
 
     def _generate_examples(self, images_path, label_path):
-        # Resize parameters to match the array size of images
-        file = np.loadtxt(label_path)
-        file = np.repeat(file, 15, axis=0)
-
-        parameters = ['omega_m', 'sigma_8', 'a_sn1', 'a_agn1', 'a_asn2', 'a_agn2']
-        choice = self.parameters
-        final = np.zeros(len(parameters), dtype=bool)
-        for y in range(len(choice)):
-            for x in range(len(parameters)):
-                if final[x] == False:
-                    final[x] = choice[y] in parameters[x]
-                elif final[x] == True:
-                    final[x] = True
-
-        a = [i for i, x in enumerate(final) if x]
-
-        assert len(a) != 0, 'Invalid parameters' #not sure why this is != when it should be ==?
-                                                # Also this doesn't ensure the user can't enter an incorrect value
-        file = file[:, a]
-
         with tf.io.gfile.GFile(images_path, "rb") as f:
             images = np.load(f)
-            images = np.expand_dims(images, -1)
-        for i, (image, label) in enumerate(zip(images, file)):
+            images = np.expand_dims(images, axis=-1)
+        with tf.io.gfile.GFile(label_path, "rb") as f:
+            labels = np.loadtxt(f)
+            labels = np.repeat(labels, 15, axis=0)
+            labels = labels[:, self.parameter_indices]
+        for i, (image, label) in enumerate(zip(images, labels)):
             record = {
                 "image": image,
                 "label": label,
