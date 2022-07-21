@@ -115,7 +115,6 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], sim_set, field] + self.parameters))
         super().__init__(*kwargs, **kwds)
 
-
     def _info(self):
         return tfds.core.DatasetInfo(
             builder=self,
@@ -171,10 +170,10 @@ class CMD(tfds.core.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
-        params_file = 'params_'+self.simulation+'.txt'
+        params_file = 'params_' + self.simulation + '.txt'
         assert params_file in self._cmd_info.label_files, 'Invalid parameter file'
         cmd_label_path = dl_manager.download(os.path.join(_CMD_URL, params_file))
-        data_file = 'Maps_'+self.field+'_'+self.simulation+'_'+self.sim_set+'_z=0.00.npy'
+        data_file = 'Maps_' + self.field + '_' + self.simulation + '_' + self.sim_set + '_z=0.00.npy'
         assert data_file in self._cmd_info.train_files, 'Invalid data file'
         cmd_data_path = dl_manager.download(os.path.join(_CMD_URL, data_file))
         return {
@@ -198,7 +197,6 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                 "label": label,
             }
             yield i, record
-
 
 
 class CMDInfo(
