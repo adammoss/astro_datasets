@@ -85,7 +85,7 @@ _CMD_SIMBA_LH_Z_DATA_FILENAME = "Maps_Z_SIMBA_LH_z=0.00.npy"
 _CMD_IMAGE_SIZE = 256
 _CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
-_CMD_DEFAULT_PARAMETERS = ['omega_m', 'sigma_8', 'a_sn1', 'a_agn1', 'a_asn2', 'a_agn2']
+_CMD_DEFAULT_PARAMETERS = ['omegam', 'sigma8', 'asn1', 'aagn1', 'asn2', 'aagn2']
 
 class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
@@ -105,7 +105,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         else:
             self.parameters = _CMD_DEFAULT_PARAMETERS
         self.parameter_indices = [_CMD_DEFAULT_PARAMETERS.index(p) for p in self.parameters]
-        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation, sim_set, field] + self.parameters))
+        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], sim_set, field] + self.parameters))
         super().__init__(*kwargs, **kwds)
 
 
