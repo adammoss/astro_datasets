@@ -23,17 +23,39 @@ _LABELS_TEST_URL = "labels_test.npy?download=1"
 _MLSST_IMAGE_SIZE = 100
 _MLSST_IMAGE_SHAPE = (3, _MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE)
 
+_URL = "https://zenodo.org/record/5514180/files/"
+
+_DATA_OPTIONS = ['Y1', 'Y10']
+
+
+class MLSSTConfig(tfds.core.BuilderConfig):
+    """BuilderConfig for MLSST"""
+
+    def __init__(self, *, data=None, **kwargs):
+        """Constructs a MLSSTConfig.
+        Args:
+          data: `str`, one of `_DATA_OPTIONS`.
+          **kwargs: keyword arguments forwarded to super.
+        """
+        if data not in _DATA_OPTIONS:
+            raise ValueError("data must be one of %s" % _DATA_OPTIONS)
+
+        super(MLSSTConfig, self).__init__(**kwargs)
+        self.data = data
+
 
 class MLSST(tfds.core.GeneratorBasedBuilder):
     """Mock LSST dataset"""
 
-    VERSION = tfds.core.Version("1.0.0")
-    num_classes = 3
+    BUILDER_CONFIGS = [
+        MLSSTConfig(
+            name=config_name,
+            version=tfds.core.Version("1.0.0"),
+            data=config_name,
+        )for config_name in _DATA_OPTIONS
+    ]
 
-    def __init__(self, data_type, **kwargs):
-        self.data_type = data_type
-        assert self.data_type == "Y10" or self.data_type == "Y1", "Incorrect data type entered"
-        super().__init__(**kwargs)
+    num_classes = 3
 
     def _info(self):
         return tfds.core.DatasetInfo(
@@ -53,29 +75,29 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
     def _mlsst_info(self):
         return MLSSTInfo(
             name=self.name,
-            url="https://zenodo.org/record/5514180/files/",
-            Y10_train_files="images_Y10_train.npy?download=1",
-            Y1_train_files="images_Y1_train.npy?download=1",
-            Y10_validation_files="images_Y10_valid.npy?download=1",
-            Y1_validation_files="images_Y1_valid.npy?download=1",
-            Y10_test_files="images_Y10_test.npy?download=1",
-            Y1_test_files="images_Y1_test.npy?download=1",
-            train_label_files="labels_train.npy?download=1",
-            validation_label_files="labels_valid.npy?download=1",
-            test_label_files="labels_test.npy?download=1",
+            url=_URL,
+            Y10_train_files=_Y10_IMAGES_TRAIN_URL,
+            Y1_train_files=_Y1_IMAGES_TRAIN_URL,
+            Y10_validation_files=_Y10_IMAGES_VALID_URL,
+            Y1_validation_files=_Y1_IMAGES_VALID_URL,
+            Y10_test_files=_Y10_IMAGES_TEST_URL,
+            Y1_test_files=_Y1_IMAGES_TEST_URL,
+            train_label_files=_LABELS_TRAIN_URL,
+            validation_label_files=_LABELS_VALID_URL,
+            test_label_files=_LABELS_TEST_URL,
             label_keys=["label"],
         )
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
 
-        if self.data_type == "Y10":
+        if self.builder_config.name == "Y10":
 
             train_image_url = self._mlsst_info.Y10_train_files
             valid_image_url = self._mlsst_info.Y10_validation_files
             test_image_url = self._mlsst_info.Y10_test_files
 
-        elif self.data_type == "Y1":
+        elif self.builder_config.name == "Y1":
 
             train_image_url = self._mlsst_info.Y1_train_files
             valid_image_url = self._mlsst_info.Y1_validation_files
