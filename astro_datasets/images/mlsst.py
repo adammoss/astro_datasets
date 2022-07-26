@@ -1,25 +1,27 @@
 import tensorflow_datasets as tfds
 import numpy as np
 import tensorflow as tf
+import os
+import collections
 
 
-_Y10_IMAGES_TRAIN_URL = "https://zenodo.org/record/5514180/files/images_Y10_train.npy?download=1"
-_Y1_IMAGES_TRAIN_URL = "https://zenodo.org/record/5514180/files/images_Y1_train.npy?download=1"
-_LABELS_TRAIN_URL = "https://zenodo.org/record/5514180/files/labels_train.npy?download=1"
+_Y10_IMAGES_TRAIN_URL = "images_Y10_train.npy?download=1"
+_Y1_IMAGES_TRAIN_URL = "images_Y1_train.npy?download=1"
+_LABELS_TRAIN_URL = "labels_train.npy?download=1"
 
 
-_Y10_IMAGES_VALID_URL = "https://zenodo.org/record/5514180/files/images_Y10_valid.npy?download=1"
-_Y1_IMAGES_VALID_URL = "https://zenodo.org/record/5514180/files/images_Y1_valid.npy?download=1"
-_LABELS_VALID_URL = "https://zenodo.org/record/5514180/files/labels_valid.npy?download=1"
+_Y10_IMAGES_VALID_URL = "images_Y10_valid.npy?download=1"
+_Y1_IMAGES_VALID_URL = "images_Y1_valid.npy?download=1"
+_LABELS_VALID_URL = "labels_valid.npy?download=1"
 
 
-_Y10_IMAGES_TEST_URL = "https://zenodo.org/record/5514180/files/images_Y10_test.npy?download=1"
-_Y1_IMAGES_TEST_URL = "https://zenodo.org/record/5514180/files/images_Y1_test.npy?download=1"
-_LABELS_TEST_URL = "https://zenodo.org/record/5514180/files/labels_test.npy?download=1"
+_Y10_IMAGES_TEST_URL = "images_Y10_test.npy?download=1"
+_Y1_IMAGES_TEST_URL = "images_Y1_test.npy?download=1"
+_LABELS_TEST_URL = "labels_test.npy?download=1"
 
 
 _MLSST_IMAGE_SIZE = 100
-_MLSST_IMAGE_SHAPE = (_MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE, 3)
+_MLSST_IMAGE_SHAPE = (3, _MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE)
 
 
 class MLSST(tfds.core.GeneratorBasedBuilder):
@@ -28,10 +30,10 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
     VERSION = tfds.core.Version("1.0.0")
     num_classes = 3
 
-    def __init__(self, data_type, *kwargs):
+    def __init__(self, data_type, **kwargs):
         self.data_type = data_type
         assert self.data_type == "Y10" or self.data_type == "Y1", "Incorrect data type entered"
-        super().__init__(*kwargs)
+        super().__init__(**kwargs)
 
     def _info(self):
         return tfds.core.DatasetInfo(
@@ -40,84 +42,69 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
                          "exposure time directly to raw images: low-noise 10 year (Y10) survey, high-noise 1 year (Y1)."
                          "The data is split into 3 sets: training, validation and testing."),
             features=tfds.features.FeaturesDict({
-                "image": tfds.features.Image(shape=_MLSST_IMAGE_SHAPE),
+                "image": tfds.features.Tensor(shape=_MLSST_IMAGE_SHAPE, dtype=tf.float64),
                 "label": tfds.features.ClassLabel(num_classes=self.num_classes),
             }),
             supervised_keys=("image", "label"),
             homepage="https://zenodo.org/record/5514180#.Yt-gRnbMIjJ",
         )
 
-    #@property
-    #def _mlsst_info(self):
-        #return MLSSTInfo(
-            #name=self.name,
-            #url="https://zenodo.org/record/5514180#.Yt-gRnbMIjJ",
-
-
-        #)
+    @property
+    def _mlsst_info(self):
+        return MLSSTInfo(
+            name=self.name,
+            url="https://zenodo.org/record/5514180/files/",
+            Y10_train_files="images_Y10_train.npy?download=1",
+            Y1_train_files="images_Y1_train.npy?download=1",
+            Y10_validation_files="images_Y10_valid.npy?download=1",
+            Y1_validation_files="images_Y1_valid.npy?download=1",
+            Y10_test_files="images_Y10_test.npy?download=1",
+            Y1_test_files="images_Y1_test.npy?download=1",
+            train_label_files="labels_train.npy?download=1",
+            validation_label_files="labels_valid.npy?download=1",
+            test_label_files="labels_test.npy?download=1",
+            label_keys=["label"],
+        )
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
 
         if self.data_type == "Y10":
 
-            train_image_url = _Y10_IMAGES_TRAIN_URL.format(self.builder_config.data)
-            valid_image_url = _Y10_IMAGES_VALID_URL.format(self.builder_config.data)
-            test_image_url = _Y10_IMAGES_TEST_URL.format(self.builder_config.data)
+            train_image_url = self._mlsst_info.Y10_train_files
+            valid_image_url = self._mlsst_info.Y10_validation_files
+            test_image_url = self._mlsst_info.Y10_test_files
 
         elif self.data_type == "Y1":
 
-            train_image_url = _Y1_IMAGES_TRAIN_URL.format(self.builder_config.data)
-            valid_image_url = _Y1_IMAGES_VALID_URL.format(self.builder_config.data)
-            test_image_url = _Y1_IMAGES_TEST_URL.format(self.builder_config.data)
+            train_image_url = self._mlsst_info.Y1_train_files
+            valid_image_url = self._mlsst_info.Y1_validation_files
+            test_image_url = self._mlsst_info.Y1_test_files
 
-        train_label_url = _LABELS_TRAIN_URL.format(self.builder_config.name)
-        valid_label_url = _LABELS_VALID_URL.format(self.builder_config.name)
-        test_label_url = _LABELS_TEST_URL.format(self.builder_config.name)
+        train_label_url = self._mlsst_info.train_label_files
+        valid_label_url = self._mlsst_info.validation_label_files
+        test_label_url = self._mlsst_info.test_label_files
 
-        train_image_path, train_label_path = dl_manager.download([
-            train_image_url,
-            train_label_url,
-        ])
-
-        valid_image_path, valid_label_path = dl_manager.download([
-            valid_image_url,
-            valid_label_url,
-        ])
-
-        test_image_path, test_label_path = dl_manager.download([
-            test_image_url,
-            test_label_url,
-        ])
-
-        return [
-            tfds.core.SplitGenerator(
-                name=tfds.Split.TRAIN,
-                gen_kwargs={
-                    "image_path": train_image_path,
-                    "label_path": train_label_path,
-                }),
-
-            tfds.core.SplitGenerator(
-                name=tfds.Split.VALIDATION,
-                gen_kwargs={
-                    "image_path": valid_image_path,
-                    "label_path": valid_label_path,
-                }),
-
-            tfds.core.SplitGenerator(
-                name=tfds.Split.TEST,
-                gen_kwargs={
-                    "image_path": test_image_path,
-                    "label_path": test_label_path,
-                }),
-        ]
+        return {
+           'train': self._generate_examples(
+               image_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_image_url)),
+               label_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_label_url)),
+           ),
+           'validation': self._generate_examples(
+               image_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_image_url)),
+               label_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_label_url)),
+           ),
+           'test': self._generate_examples(
+                image_path=dl_manager.download(os.path.join(self._mlsst_info.url, test_image_url)),
+                label_path=dl_manager.download(os.path.join(self._mlsst_info.url, test_label_url)),
+           ),
+        }
 
     def _generate_examples(self, image_path, label_path):
         with tf.io.gfile.GFile(image_path, "rb") as f:
             images = np.load(f)
         with tf.io.gfile.GFile(label_path, "rb") as f:
-            labels = np.load(f)
+            labels = np.argmax(np.load(f), axis=1)
         for i, (image, label) in enumerate(zip(images, labels)):
             record = {
                 "image": image,
@@ -127,7 +114,28 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
 
 
 
+class MLSSTInfo(
+    collections.namedtuple("_MLSSTInfo", [
+        "name",
+        "url",
+        "Y10_train_files",
+        "Y1_train_files",
+        "Y10_validation_files",
+        "Y1_validation_files",
+        "Y10_test_files",
+        "Y1_test_files",
+        "train_label_files",
+        "validation_label_files",
+        "test_label_files",
+        "label_keys"
+    ])):
+    """Contains the information necessary to generate a CIFAR dataset.
+    Attributes:
+      name (str): name of dataset.
+      url (str): data URL.
 
+      label_keys (list<str>): names of the label keys in the data.
+    """
 
 
 
