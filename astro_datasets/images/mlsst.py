@@ -22,7 +22,7 @@ _MLSST_IMAGE_SIZE = 100
 _MLSST_IMAGE_SHAPE = (_MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE, 3)
 
 
-class MOCK_LSST(tfds.core.GeneratorBasedBuilder):
+class MLSST(tfds.core.GeneratorBasedBuilder):
     """Mock LSST dataset"""
 
     VERSION = tfds.core.Version("1.0.0")
@@ -40,12 +40,21 @@ class MOCK_LSST(tfds.core.GeneratorBasedBuilder):
                          "exposure time directly to raw images: low-noise 10 year (Y10) survey, high-noise 1 year (Y1)."
                          "The data is split into 3 sets: training, validation and testing."),
             features=tfds.features.FeaturesDict({
-                "image": tfds.features.Image(shape=_MIRABEST_IMAGE_SHAPE),
+                "image": tfds.features.Image(shape=_MLSST_IMAGE_SHAPE),
                 "label": tfds.features.ClassLabel(num_classes=self.num_classes),
             }),
             supervised_keys=("image", "label"),
             homepage="https://zenodo.org/record/5514180#.Yt-gRnbMIjJ",
         )
+
+    #@property
+    #def _mlsst_info(self):
+        #return MLSSTInfo(
+            #name=self.name,
+            #url="https://zenodo.org/record/5514180#.Yt-gRnbMIjJ",
+
+
+        #)
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""

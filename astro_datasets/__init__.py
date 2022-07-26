@@ -12,7 +12,7 @@ builders = [
     'mirabest',
     'mirabest_confident',
     'cmd',
-    'mock_lsst',
+    'mlsst',
 ]
 
 __version__ = '0.0.7'
