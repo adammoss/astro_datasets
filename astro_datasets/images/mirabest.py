@@ -162,7 +162,7 @@ class MiraBestInfo(
         "test_files",
         "label_files",
         "label_keys",
-        ])):
+    ])):
     """Contains the information necessary to generate a CIFAR dataset.
     Attributes:
       name (str): name of dataset.
@@ -182,5 +182,3 @@ def _load_data(path):
         data = pickle.load(f)
     for i in range(len(data['labels'])):
         yield data['labels'][i], np.expand_dims(data['data'][i], -1)
-
-

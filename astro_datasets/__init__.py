@@ -11,9 +11,8 @@ builders = [
     'spcc',
     'plasticc',
     'mirabest',
-    'mirabest_confident',
     'cmd',
     'mlsst',
 ]
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'

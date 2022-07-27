@@ -4,21 +4,17 @@ import tensorflow as tf
 import os
 import collections
 
-
 _Y10_IMAGES_TRAIN_URL = "images_Y10_train.npy?download=1"
 _Y1_IMAGES_TRAIN_URL = "images_Y1_train.npy?download=1"
 _LABELS_TRAIN_URL = "labels_train.npy?download=1"
-
 
 _Y10_IMAGES_VALID_URL = "images_Y10_valid.npy?download=1"
 _Y1_IMAGES_VALID_URL = "images_Y1_valid.npy?download=1"
 _LABELS_VALID_URL = "labels_valid.npy?download=1"
 
-
 _Y10_IMAGES_TEST_URL = "images_Y10_test.npy?download=1"
 _Y1_IMAGES_TEST_URL = "images_Y1_test.npy?download=1"
 _LABELS_TEST_URL = "labels_test.npy?download=1"
-
 
 _MLSST_IMAGE_SIZE = 100
 _MLSST_IMAGE_SHAPE = (3, _MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE)
@@ -52,7 +48,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
             name=config_name,
             version=tfds.core.Version("1.0.0"),
             data=config_name,
-        )for config_name in _DATA_OPTIONS
+        ) for config_name in _DATA_OPTIONS
     ]
 
     num_classes = 3
@@ -108,18 +104,18 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
         test_label_url = self._mlsst_info.test_label_files
 
         return {
-           'train': self._generate_examples(
-               image_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_image_url)),
-               label_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_label_url)),
-           ),
-           'validation': self._generate_examples(
-               image_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_image_url)),
-               label_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_label_url)),
-           ),
-           'test': self._generate_examples(
+            'train': self._generate_examples(
+                image_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_image_url)),
+                label_path=dl_manager.download(os.path.join(self._mlsst_info.url, train_label_url)),
+            ),
+            'validation': self._generate_examples(
+                image_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_image_url)),
+                label_path=dl_manager.download(os.path.join(self._mlsst_info.url, valid_label_url)),
+            ),
+            'test': self._generate_examples(
                 image_path=dl_manager.download(os.path.join(self._mlsst_info.url, test_image_url)),
                 label_path=dl_manager.download(os.path.join(self._mlsst_info.url, test_label_url)),
-           ),
+            ),
         }
 
     def _generate_examples(self, image_path, label_path):
@@ -157,13 +153,3 @@ class MLSSTInfo(
 
       label_keys (list<str>): names of the label keys in the data.
     """
-
-
-
-
-
-
-
-
-
-
