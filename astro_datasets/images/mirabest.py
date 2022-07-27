@@ -9,25 +9,68 @@ import numpy as np
 _MIRABEST_IMAGE_SIZE = 150
 _MIRABEST_IMAGE_SHAPE = (_MIRABEST_IMAGE_SIZE, _MIRABEST_IMAGE_SIZE, 1)
 
+_DATA_OPTIONS = ['all', 'confident']
+
+
+class MirabestConfig(tfds.core.BuilderConfig):
+    """BuilderConfig for Mirabest"""
+
+    def __init__(self, *, data=None, num_classes=None, class_keys=None, label_names=None, **kwargs):
+        """Constructs a MirabestConfig.
+        Args:
+          data: `str`, one of `_DATA_OPTIONS`.
+          **kwargs: keyword arguments forwarded to super.
+        """
+        if data not in _DATA_OPTIONS:
+            raise ValueError("data must be one of %s" % _DATA_OPTIONS)
+
+        super(MirabestConfig, self).__init__(**kwargs)
+        self.data = data
+        self.num_classes = num_classes
+        self.class_keys = class_keys
+        self.label_names = label_names
+
 
 class MIRABEST(tfds.core.GeneratorBasedBuilder):
     """MiraBest"""
 
     VERSION = tfds.core.Version("1.0.0")
-    num_classes = 10
-    class_keys = {
-        0: 0,
-        1: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-        5: 5,
-        6: 6,
-        7: 7,
-        8: 8,
-        9: 9,
-    }
-    label_names = None
+
+    BUILDER_CONFIGS = [
+        MirabestConfig(
+            name='all',
+            version=tfds.core.Version("1.0.0"),
+            data='all',
+            num_classes=10,
+            class_keys={
+                0: 0,
+                1: 1,
+                2: 2,
+                3: 3,
+                4: 4,
+                5: 5,
+                6: 6,
+                7: 7,
+                8: 8,
+                9: 9,
+            },
+            label_names=None
+        ),
+        MirabestConfig(
+            name='confident',
+            version=tfds.core.Version("1.0.0"),
+            data='confident',
+            num_classes=2,
+            class_keys={
+                0: 0,
+                1: 0,
+                2: 0,
+                5: 1,
+                6: 1
+            },
+            label_names=['FR1', 'FR2']
+        ),
+    ]
 
     def _info(self):
         return tfds.core.DatasetInfo(
@@ -38,7 +81,7 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
             features=tfds.features.FeaturesDict({
                 "id": tfds.features.Text(),
                 "image": tfds.features.Image(shape=_MIRABEST_IMAGE_SHAPE),
-                "label": tfds.features.ClassLabel(num_classes=self.num_classes),
+                "label": tfds.features.ClassLabel(num_classes=self.builder_config.num_classes),
             }),
             supervised_keys=("image", "label"),
             homepage="https://zenodo.org/record/5588282#.Yr7X8HbMIjJ",
@@ -62,6 +105,7 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         """Returns SplitGenerators."""
+
         mirabest_path = dl_manager.download_and_extract(self._mirabest_info.url)
         mirabest_info = self._mirabest_info
 
@@ -73,8 +117,8 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
             labels_path = os.path.join(mirabest_path, label_file)
             with open(labels_path, 'rb') as f:
                 data = pickle.load(f, encoding='latin1')
-            if self.label_names is not None:
-                self.info.features[label_key].names = self.label_names
+            if self.builder_config.label_names is not None:
+                self.info.features[label_key].names = self.builder_config.label_names
             else:
                 self.info.features[label_key].names = data['label_names']
 
@@ -97,9 +141,9 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
         index = 0  # Using index as key since data is always loaded in same order.
         for path in filepaths:
             for label, np_image in _load_data(path):
-                if label not in self.class_keys:
+                if label not in self.builder_config.class_keys:
                     continue
-                record = dict(zip(label_keys, [self.class_keys[label]]))
+                record = dict(zip(label_keys, [self.builder_config.class_keys[label]]))
                 # Note: "id" is only provided for the user convenience. To shuffle the
                 # dataset we use `index`, so that the sharding is compatible with
                 # earlier versions.
@@ -140,13 +184,3 @@ def _load_data(path):
         yield data['labels'][i], np.expand_dims(data['data'][i], -1)
 
 
-class MIRABESTConfident(MIRABEST):
-    num_classes = 2
-    class_keys = {
-        0: 0,
-        1: 0,
-        2: 0,
-        5: 1,
-        6: 1
-    }
-    label_names = ['FR1', 'FR2']
