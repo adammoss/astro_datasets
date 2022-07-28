@@ -17,7 +17,7 @@ _Y1_IMAGES_TEST_URL = "images_Y1_test.npy?download=1"
 _LABELS_TEST_URL = "labels_test.npy?download=1"
 
 _MLSST_IMAGE_SIZE = 100
-_MLSST_IMAGE_SHAPE = (3, _MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE)
+_MLSST_IMAGE_SHAPE = (_MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE, 3)
 
 _URL = "https://zenodo.org/record/5514180/files/"
 
@@ -120,7 +120,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
 
     def _generate_examples(self, image_path, label_path):
         with tf.io.gfile.GFile(image_path, "rb") as f:
-            images = np.transpose(np.load(f))
+            images = np.transpose(np.load(f), (0, 3, 2, 1))
         with tf.io.gfile.GFile(label_path, "rb") as f:
             labels = np.argmax(np.load(f), axis=1)
         for i, (image, label) in enumerate(zip(images, labels)):
