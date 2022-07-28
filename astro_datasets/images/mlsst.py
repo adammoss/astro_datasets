@@ -120,7 +120,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
 
     def _generate_examples(self, image_path, label_path):
         with tf.io.gfile.GFile(image_path, "rb") as f:
-            images = np.transpose(np.load(f), (0, 3, 2, 1))
+            images = np.transpose(np.load(f), (0, 2, 3, 1))
         with tf.io.gfile.GFile(label_path, "rb") as f:
             labels = np.argmax(np.load(f), axis=1)
         for i, (image, label) in enumerate(zip(images, labels)):
