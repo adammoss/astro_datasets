@@ -96,7 +96,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
 
     URL = _CMD_URL
-    VERSION = tfds.core.Version("1.0.2")
+    VERSION = tfds.core.Version("1.0.3")
 
     def __init__(self, simulation, field, parameters=None, *kwargs, **kwds):
         assert simulation in _CMD_SIMULATIONS, 'Not a valid simulation'
@@ -111,7 +111,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
         else:
             self.parameters = _CMD_PARAMETERS
         self.parameter_indices = [_CMD_PARAMETERS.index(p) for p in self.parameters]
-        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation[:1], field] + self.parameters))
+        kwds['data_dir'] = os.path.join(DATA_DIR, '_'.join([simulation, field] + self.parameters))
         super().__init__(*kwargs, **kwds)
 
     def _info(self):
