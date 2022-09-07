@@ -163,7 +163,7 @@ class MiraBestInfo(
         "label_files",
         "label_keys",
     ])):
-    """Contains the information necessary to generate a CIFAR dataset.
+    """Contains the information necessary to generate a Mirabest dataset.
     Attributes:
       name (str): name of dataset.
       url (str): data URL.

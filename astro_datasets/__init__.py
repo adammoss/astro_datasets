@@ -6,6 +6,7 @@ import astro_datasets.time_series.plasticc
 import astro_datasets.images.mirabest
 import astro_datasets.images.cmd
 import astro_datasets.images.mlsst
+import astro_datasets.images.slc
 
 builders = [
     'spcc',
@@ -13,6 +14,7 @@ builders = [
     'mirabest',
     'cmd',
     'mlsst',
+    'slc',
 ]
 
 __version__ = '0.0.10'

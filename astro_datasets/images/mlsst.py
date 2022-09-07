@@ -146,7 +146,7 @@ class MLSSTInfo(
         "test_label_files",
         "label_keys"
     ])):
-    """Contains the information necessary to generate a CIFAR dataset.
+    """Contains the information necessary to generate a MLSST dataset.
     Attributes:
       name (str): name of dataset.
       url (str): data URL.
