@@ -19,7 +19,7 @@ _LABELS_TEST_URL = "labels_test.npy?download=1"
 _MLSST_IMAGE_SIZE = 100
 _MLSST_IMAGE_SHAPE = (_MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE, 3)
 
-_URL = "https://zenodo.org/record/5514180/files/"
+_URL = "https://zenodo.org/record/5514180"
 
 _DATA_OPTIONS = ['Y1', 'Y10']
 
