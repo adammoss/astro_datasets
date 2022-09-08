@@ -63,6 +63,7 @@ class SLC(tfds.core.GeneratorBasedBuilder):
             name=self.name,
             url="https://storage.googleapis.com/strong-lensing-challenge",
             space_file="strong-lensing-space-based-challenge1.tar.gz",
+            ground_file="",
             train_files=[
                 "strong-lensing-space-based-challenge1/train1.h5",
             ],
