@@ -12,7 +12,11 @@ Currently implemented time series datasets are:
 
 Currently implemented image datasets are:
 
-- ``mirabest``, ``mirabest/confident``
+- ``slc`` (Strong Lens Finding Challenge)
+- ``mirabest``
+- ``cmd`` (Camels MultiField Dataset)
+- ``mlsst`` (Mock LSST)
+
 
 This is based on the medical datasets repository https://github.com/ExpectationMax/medical_ts_datasets
 

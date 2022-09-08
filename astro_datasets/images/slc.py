@@ -9,7 +9,7 @@ import numpy as np
 
 _SLC_IMAGE_SIZE = 101
 
-_DATA_OPTIONS = ['ground', 'space']
+_DATA_OPTIONS = ['space']
 
 
 class SLCConfig(tfds.core.BuilderConfig):
@@ -41,12 +41,6 @@ class SLC(tfds.core.GeneratorBasedBuilder):
             data='space',
             num_channels=1,
         ),
-        SLCConfig(
-            name='ground',
-            version=tfds.core.Version("1.0.0"),
-            data='ground',
-            num_channels=4,
-        ),
     ]
 
     def _info(self):
@@ -69,7 +63,6 @@ class SLC(tfds.core.GeneratorBasedBuilder):
             name=self.name,
             url="https://storage.googleapis.com/strong-lensing-challenge",
             space_file="strong-lensing-space-based-challenge1.tar.gz",
-            ground_file="strong-lensing-space-based-challenge1.tar.gz",
             train_files=[
                 "strong-lensing-space-based-challenge1/train1.h5",
             ],
@@ -86,10 +79,6 @@ class SLC(tfds.core.GeneratorBasedBuilder):
         if self.builder_config.name == "space":
 
             slc_path = dl_manager.download_and_extract(os.path.join(self._slc_info.url, self._slc_info.space_file))
-
-        elif self.builder_config.name == "ground":
-
-            slc_path = dl_manager.download_and_extract(os.path.join(self._slc_info.url, self._slc_info.ground_file))
 
         slc_info = self._slc_info
 
