@@ -60,7 +60,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
                          "exposure time directly to raw images: low-noise 10 year (Y10) survey, high-noise 1 year (Y1)."
                          "The data is split into 3 sets: training, validation and testing."),
             features=tfds.features.FeaturesDict({
-                "image": tfds.features.Tensor(shape=_MLSST_IMAGE_SHAPE, dtype=tf.float64),
+                "image": tfds.features.Tensor(shape=_MLSST_IMAGE_SHAPE, dtype=tf.float32),
                 "label": tfds.features.ClassLabel(num_classes=self.num_classes),
             }),
             supervised_keys=("image", "label"),
