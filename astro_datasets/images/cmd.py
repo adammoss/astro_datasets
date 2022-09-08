@@ -96,7 +96,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
     """CAMELS Multifield Dataset"""
 
     URL = _CMD_URL
-    VERSION = tfds.core.Version("1.0.3")
+    VERSION = tfds.core.Version("1.0.4")
 
     def __init__(self, simulation, field, parameters=None, *kwargs, **kwds):
         assert simulation in _CMD_SIMULATIONS, 'Not a valid simulation'
@@ -125,7 +125,7 @@ class CMD(tfds.core.GeneratorBasedBuilder):
                          "(magneto-)hydrodynamic simulation."),
             features=tfds.features.FeaturesDict({
                 "image": tfds.features.Tensor(shape=_CMD_IMAGE_SHAPE, dtype=tf.float32),
-                'label': tfds.features.Tensor(shape=(len(self.parameters),), dtype=tf.float64),
+                'label': tfds.features.Tensor(shape=(len(self.parameters),), dtype=tf.float32),
             }),
             supervised_keys=("image", "label"),
             homepage="https://camels-multifield-dataset.readthedocs.io/en/latest/index.html",
@@ -185,11 +185,11 @@ class CMD(tfds.core.GeneratorBasedBuilder):
     def _generate_examples(self, images_path, label_path):
         with tf.io.gfile.GFile(images_path, "rb") as f:
             images = np.load(f)
-            images = np.expand_dims(images, axis=-1)
+            images = np.expand_dims(images, axis=-1).astype(np.float32)
         with tf.io.gfile.GFile(label_path, "rb") as f:
             labels = np.loadtxt(f)
             labels = np.repeat(labels, 15, axis=0)
-            labels = labels[:, self.parameter_indices]
+            labels = labels[:, self.parameter_indices].astype(np.float32)
         for i, (image, label) in enumerate(zip(images, labels)):
             record = {
                 "image": image,

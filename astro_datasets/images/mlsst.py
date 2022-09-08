@@ -19,7 +19,7 @@ _LABELS_TEST_URL = "labels_test.npy?download=1"
 _MLSST_IMAGE_SIZE = 100
 _MLSST_IMAGE_SHAPE = (_MLSST_IMAGE_SIZE, _MLSST_IMAGE_SIZE, 3)
 
-_URL = "https://zenodo.org/record/5514180"
+_URL = "https://zenodo.org/record/5514180/files/"
 
 _DATA_OPTIONS = ['Y1', 'Y10']
 
@@ -46,7 +46,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
     BUILDER_CONFIGS = [
         MLSSTConfig(
             name=config_name,
-            version=tfds.core.Version("1.0.0"),
+            version=tfds.core.Version("1.0.1"),
             data=config_name,
         ) for config_name in _DATA_OPTIONS
     ]
@@ -120,7 +120,7 @@ class MLSST(tfds.core.GeneratorBasedBuilder):
 
     def _generate_examples(self, image_path, label_path):
         with tf.io.gfile.GFile(image_path, "rb") as f:
-            images = np.transpose(np.load(f), (0, 2, 3, 1))
+            images = np.transpose(np.load(f), (0, 2, 3, 1)).astype(np.float32)
         with tf.io.gfile.GFile(label_path, "rb") as f:
             labels = np.argmax(np.load(f), axis=1)
         for i, (image, label) in enumerate(zip(images, labels)):
@@ -150,6 +150,5 @@ class MLSSTInfo(
     Attributes:
       name (str): name of dataset.
       url (str): data URL.
-
       label_keys (list<str>): names of the label keys in the data.
     """
