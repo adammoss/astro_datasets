@@ -34,12 +34,12 @@ class MirabestConfig(tfds.core.BuilderConfig):
 class MIRABEST(tfds.core.GeneratorBasedBuilder):
     """MiraBest"""
 
-    VERSION = tfds.core.Version("1.0.0")
+    VERSION = tfds.core.Version("1.0.1")
 
     BUILDER_CONFIGS = [
         MirabestConfig(
             name='all',
-            version=tfds.core.Version("1.0.0"),
+            version=tfds.core.Version("1.0.1"),
             data='all',
             num_classes=10,
             class_keys={
@@ -58,7 +58,7 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
         ),
         MirabestConfig(
             name='confident',
-            version=tfds.core.Version("1.0.0"),
+            version=tfds.core.Version("1.0.1"),
             data='confident',
             num_classes=2,
             class_keys={
@@ -67,6 +67,18 @@ class MIRABEST(tfds.core.GeneratorBasedBuilder):
                 2: 0,
                 5: 1,
                 6: 1
+            },
+            label_names=['FR1', 'FR2']
+        ),
+        MirabestConfig(
+            name='uncertain',
+            version=tfds.core.Version("1.0.1"),
+            data='uncertain',
+            num_classes=2,
+            class_keys={
+                3: 0,
+                4: 0,
+                7: 1,
             },
             label_names=['FR1', 'FR2']
         ),
