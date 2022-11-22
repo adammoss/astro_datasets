@@ -9,7 +9,7 @@ import numpy as np
 _MIRABEST_IMAGE_SIZE = 150
 _MIRABEST_IMAGE_SHAPE = (_MIRABEST_IMAGE_SIZE, _MIRABEST_IMAGE_SIZE, 1)
 
-_DATA_OPTIONS = ['all', 'confident']
+_DATA_OPTIONS = ['all', 'confident', 'uncertain']
 
 
 class MirabestConfig(tfds.core.BuilderConfig):
