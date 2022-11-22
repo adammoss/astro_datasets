@@ -86,9 +86,9 @@ _CMD_IMAGE_SIZE = 256
 _CMD_IMAGE_SHAPE = (_CMD_IMAGE_SIZE, _CMD_IMAGE_SIZE, 1)
 
 _CMD_PARAMETERS = ['omegam', 'sigma8', 'asn1', 'aagn1', 'asn2', 'aagn2']
-_CMD_FIELDS = ['Mtot', 'B', 'HI', 'Mcdm', 'Mgas', 'MgFe', 'Mstar', 'ne', 'P', 'T', 'Vcdm',
+_CMD_FIELDS = ['Mtot', 'Mtot_Nbody', 'B', 'HI', 'Mcdm', 'Mgas', 'MgFe', 'Mstar', 'ne', 'P', 'T', 'Vcdm',
                'Vgas', 'Z']
-_CMD_SIMULATIONS = ['IllustrisTNG', 'SIMBA', 'Nbody_IllustrisTNG', 'Nbody_SIMBA']
+_CMD_SIMULATIONS = ['IllustrisTNG', 'SIMBA']
 _CMD_SIM_SET = ['CV', 'LH']
 
 
